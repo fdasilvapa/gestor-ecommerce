@@ -1,7 +1,8 @@
 "use client";
 
-import { useCart } from "../context/CartContext";
+import { useCart } from "@/app/context/CartContext";
 import { ShoppingCart } from "lucide-react";
+import Link from "next/link";
 
 export const CartIcon = () => {
   const { cartItems } = useCart();
@@ -9,7 +10,7 @@ export const CartIcon = () => {
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <div className="fixed top-8 right-8 z-10">
+    <Link href="/carrinho" className="fixed top-8 right-8 z-10 cursor-pointer">
       <div className="relative p-3 bg-white rounded-full shadow-lg">
         <ShoppingCart className="w-6 h-6 text-gray-700" />
         {totalItems > 0 && (
@@ -18,6 +19,6 @@ export const CartIcon = () => {
           </span>
         )}
       </div>
-    </div>
+    </Link>
   );
 };
