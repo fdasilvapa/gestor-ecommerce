@@ -1,6 +1,12 @@
 "use client";
 
-import React, { createContext, useState, useContext, ReactNode } from "react";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  ReactNode,
+  useMemo,
+} from "react";
 import { CartItem, Product, CartContextType } from "../types";
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -35,8 +41,45 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     console.log("Adicionado ao carrinho:", product.name);
   };
 
+  const removeFromCart = (productId: number) => {
+    setCartItems((prevItems) =>
+      prevItems.filter((item) => item.id !== productId)
+    );
+  };
+
+  const updateQuantity = (productId: number, quantity: number) => {
+    if (quantity <= 0) {
+      removeFromCart(productId);
+      return;
+    }
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === productId ? { ...item, quantity: quantity } : item
+      )
+    );
+  };
+
+  const clearCart = () => {
+    setCartItems([]);
+  };
+
+  const totalAmount = useMemo(() => {
+    return cartItems.reduce((total, item) => {
+      return total + parseFloat(item.price) * item.quantity;
+    }, 0);
+  }, [cartItems]);
+
   return (
-    <CartContext.Provider value={{ cartItems, addToCart }}>
+    <CartContext.Provider
+      value={{
+        cartItems,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        totalAmount,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
