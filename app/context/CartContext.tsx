@@ -6,10 +6,13 @@ import React, {
   useContext,
   ReactNode,
   useMemo,
+  useEffect,
 } from "react";
 import { CartItem, Product, CartContextType } from "../types";
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
+
+const CART_STORAGE_KEY = 'gestor_cart_v2';
 
 type CartProviderProps = {
   children: ReactNode;
@@ -17,6 +20,25 @@ type CartProviderProps = {
 
 export const CartProvider = ({ children }: CartProviderProps) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const savedCart = localStorage.getItem(CART_STORAGE_KEY);
+    if (savedCart) {
+      try {
+        setCartItems(JSON.parse(savedCart));
+      } catch (error) {
+        console.error("Erro ao ler carrinho do storage:", error);
+      }
+    }
+    setIsLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
+    }
+  }, [cartItems, isLoaded]);
 
   const addToCart = (product: Product) => {
     setCartItems((prevItems) => {
