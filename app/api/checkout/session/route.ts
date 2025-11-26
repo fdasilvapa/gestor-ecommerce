@@ -25,6 +25,9 @@ export async function POST(request: Request) {
         currency: "brl",
         product_data: {
           name: item.name,
+          metadata: {
+            productId: item.id.toString(),
+          },
         },
         unit_amount: Math.round(parseFloat(item.price) * 100),
       },
