@@ -56,6 +56,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
           name: product.name,
           price: product.price,
           quantity: 1,
+          image: product.image,
         };
         return [...prevItems, newItem];
       }
@@ -87,7 +88,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
 
   const totalAmount = useMemo(() => {
     return cartItems.reduce((total, item) => {
-      return total + parseFloat(item.price) * item.quantity;
+      return total + Number(item.price) * item.quantity;
     }, 0);
   }, [cartItems]);
 
