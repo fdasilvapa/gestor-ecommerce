@@ -1,13 +1,7 @@
 import Image from "next/image";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, ImageIcon, Plus } from "lucide-react";
 import { useCart } from "../context/CartContext";
-
-interface Product {
-  id: number;
-  name: string;
-  price: string | number;
-  imagePath?: string | null;
-}
+import { Product } from "../types";
 
 interface ProductCardProps {
   product: Product;
@@ -20,52 +14,77 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   const imageUrl = product.imagePath
     ? `${API_BASE_URL}${product.imagePath}`
-    : "https://placehold.co/400x400/e2e8f0/94a3b8?text=Sem+Imagem";
+    : null;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col h-full border border-gray-100">
-      {/* Área da Imagem */}
-      <div className="relative h-48 w-full bg-gray-50">
-        <Image
-          src={imageUrl}
-          alt={product.name}
-          fill
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        />
+    <div className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col h-full border border-gray-100">
+      {/* ÁREA DA IMAGEM */}
+      <div className="relative h-56 w-full bg-gray-50 flex items-center justify-center p-4 overflow-hidden">
+        {imageUrl ? (
+          <Image
+            src={imageUrl}
+            alt={product.name}
+            fill
+            className="object-contain transition-transform duration-500 group-hover:scale-110 mix-blend-multiply"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        ) : (
+          <div className="flex flex-col items-center justify-center text-gray-300">
+            <ImageIcon className="w-12 h-12 mb-2" />
+            <span className="text-xs uppercase font-bold tracking-wider">
+              Sem Foto
+            </span>
+          </div>
+        )}
+
+        {/* Badge Opcional (Ex: "Novo") */}
+        <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold text-gray-800 shadow-sm">
+          NOVO
+        </div>
       </div>
 
-      <div className="p-4 flex flex-col grow">
-        <h3 className="text-lg font-semibold text-gray-800 mb-1 truncate">
-          {product.name}
-        </h3>
+      {/* CONTEÚDO */}
+      <div className="p-5 flex flex-col grow">
+        <div className="mb-4">
+          <h3
+            className="text-lg font-bold text-gray-800 mb-1 leading-tight line-clamp-2"
+            title={product.name}
+          >
+            {product.name}
+          </h3>
+          <p className="text-gray-500 text-sm line-clamp-2 h-10">
+            {product.description || "Sem descrição disponível."}
+          </p>
+        </div>
 
-        <p className="text-gray-500 text-sm mb-4 grow">
-          {/* Se tiver descrição no futuro, ela entra aqui */}
-          Produto incrível
-        </p>
-
-        <div className="flex items-center justify-between mt-auto">
-          <span className="text-xl font-bold text-green-600">
-            {new Intl.NumberFormat("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            }).format(Number(product.price))}
-          </span>
+        <div className="flex items-end justify-between mt-auto pt-4 border-t border-gray-50">
+          <div className="flex flex-col">
+            <span className="text-xs text-gray-400 font-medium">Preço</span>
+            <span className="text-2xl font-bold text-gray-900">
+              {new Intl.NumberFormat("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              }).format(Number(product.price))}
+            </span>
+          </div>
 
           <button
             onClick={() =>
               addToCart({
-                id: product.id,
-                name: product.name,
+                ...product,
+                image: imageUrl || undefined,
                 price: product.price.toString(),
-                image: imageUrl,
               })
             }
-            className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full transition-colors"
+            className="bg-green-600 hover:bg-green-700 active:bg-green-800 text-white p-3 rounded-xl transition-colors shadow-lg shadow-green-200 flex items-center justify-center group/btn"
             aria-label="Adicionar ao carrinho"
           >
-            <ShoppingCart size={20} />
+            <ShoppingCart size={20} className="mr-0 lg:mr-2" />
+            <span className="hidden lg:inline font-medium">Comprar</span>
+            <Plus
+              size={14}
+              className="ml-1 hidden lg:block opacity-0 group-hover/btn:opacity-100 transition-opacity translate-x-1 group-hover/btn:translate-x-0"
+            />
           </button>
         </div>
       </div>
