@@ -1,16 +1,19 @@
-export type Product = {
+export interface Product {
   id: number;
   name: string;
-  description: string | null;
-  price: string;
-};
+  price: string | number;
+  description?: string;
+  imagePath?: string | null;
+  image?: string;
+}
 
-export type CartItem = {
+export interface CartItem {
   id: number;
   name: string;
-  price: string;
+  price: string | number;
   quantity: number;
-};
+  image?: string;
+}
 
 export type CartContextType = {
   cartItems: CartItem[];
