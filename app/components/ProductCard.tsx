@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { ShoppingCart, ImageIcon, Plus } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { Product } from "../types";
@@ -20,38 +21,48 @@ export default function ProductCard({ product }: ProductCardProps) {
     <div className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col h-full border border-gray-100">
       {/* ÁREA DA IMAGEM */}
       <div className="relative h-56 w-full bg-gray-50 flex items-center justify-center p-4 overflow-hidden">
-        {imageUrl ? (
-          <Image
-            src={imageUrl}
-            alt={product.name}
-            fill
-            className="object-contain transition-transform duration-500 group-hover:scale-110 mix-blend-multiply"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-        ) : (
-          <div className="flex flex-col items-center justify-center text-gray-300">
-            <ImageIcon className="w-12 h-12 mb-2" />
-            <span className="text-xs uppercase font-bold tracking-wider">
-              Sem Foto
-            </span>
-          </div>
-        )}
+        <Link
+          href={`/produto/${product.id}`}
+          className="block relative h-56 w-full bg-gray-50 items-center justify-center p-4 overflow-hidden cursor-pointer"
+        >
+          {imageUrl ? (
+            <Image
+              src={imageUrl}
+              alt={product.name}
+              fill
+              className="object-contain transition-transform duration-500 group-hover:scale-110 mix-blend-multiply"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center text-gray-300">
+              <ImageIcon className="w-12 h-12 mb-2" />
+              <span className="text-xs uppercase font-bold tracking-wider">
+                Sem Foto
+              </span>
+            </div>
+          )}
 
-        {/* Badge Opcional (Ex: "Novo") */}
-        <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold text-gray-800 shadow-sm">
-          NOVO
-        </div>
+          {/* Badge Opcional (Ex: "Novo") */}
+          <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold text-gray-800 shadow-sm">
+            NOVO
+          </div>
+        </Link>
       </div>
 
       {/* CONTEÚDO */}
       <div className="p-5 flex flex-col grow">
         <div className="mb-4">
-          <h3
-            className="text-lg font-bold text-gray-800 mb-1 leading-tight line-clamp-2"
-            title={product.name}
+          <Link
+            href={`/produto/${product.id}`}
+            className="hover:text-green-600 transition-colors"
           >
-            {product.name}
-          </h3>
+            <h3
+              className="text-lg font-bold text-gray-800 mb-1 leading-tight line-clamp-2"
+              title={product.name}
+            >
+              {product.name}
+            </h3>
+          </Link>
           <p className="text-gray-500 text-sm line-clamp-2 h-10">
             {product.description || "Sem descrição disponível."}
           </p>

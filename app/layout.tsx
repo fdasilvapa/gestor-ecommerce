@@ -1,25 +1,33 @@
 import type { Metadata } from "next";
-import React from "react";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "./context/CartContext";
-import { CartIcon } from "./components/CartIcon";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Gestor E-commerce",
-  description: "Sua vitrine de produtos",
+  title: "GestorShop | Tecnologia",
+  description: "O melhor e-commerce de tecnologia",
 };
 
-type RootLayoutProps = {
+export default function RootLayout({
+  children,
+}: Readonly<{
   children: React.ReactNode;
-};
-
-export default function RootLayout({ children }: RootLayoutProps) {
+}>) {
   return (
-    <html lang="pt-br">
-      <body>
+    <html lang="pt-BR">
+      <body
+        className={`${inter.className} bg-gray-50 flex flex-col min-h-screen`}
+      >
         <CartProvider>
-          <CartIcon />
-          {children}
+          <Navbar />
+
+          <div className="grow">{children}</div>
+
+          <Footer />
         </CartProvider>
       </body>
     </html>
