@@ -46,18 +46,19 @@ export async function GET(request: Request) {
       }
 
       return {
-        id: parseInt(originalId),
+        productId: parseInt(originalId),
         quantity: item.quantity,
       };
     });
 
     const v1Url = `${process.env.GESTOR_API_URL}/sales`;
 
-    const payloadV1 = {
-      products: itemsV1,
+    const payloadForV1 = {
+      saleDate: new Date().toISOString(),
+      items: itemsV1,
     };
 
-    console.log(`Tentando registrar venda no V1: ${v1Url}`);
+    console.log(`Enviando para V1:`, JSON.stringify(payloadForV1));
 
     const v1Response = await fetch(v1Url, {
       method: "POST",
@@ -65,7 +66,7 @@ export async function GET(request: Request) {
         "Content-Type": "application/json",
         "x-api-key": process.env.GESTOR_API_KEY!,
       },
-      body: JSON.stringify(payloadV1),
+      body: JSON.stringify(payloadForV1),
     });
 
     const responseText = await v1Response.text();
@@ -79,7 +80,7 @@ export async function GET(request: Request) {
         const jsonError = JSON.parse(responseText);
         errorMessage = jsonError.message || responseText;
       } catch (e) {
-        // Não era JSON, mantém o texto puro
+        // Não era JSON
       }
 
       throw new Error(`V1 recusou a venda: ${errorMessage}`);
