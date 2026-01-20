@@ -7,32 +7,43 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2025-10-29.clover",
   typescript: true,
-} as any);
+});
 
 export async function POST(request: Request) {
   try {
     const cartItems = (await request.json()) as CartItem[];
-
     const origin = request.headers.get("origin") || "http://localhost:3001";
 
     if (!cartItems || cartItems.length === 0) {
       return NextResponse.json({ message: "Carrinho vazio." }, { status: 400 });
     }
 
-    const line_items = cartItems.map((item) => ({
-      price_data: {
-        currency: "brl",
-        product_data: {
+    const line_items = cartItems.map((item) => {
+      const unitAmount = Math.round(Number(item.price) * 100);
+
+      const productData: Stripe.Checkout.SessionCreateParams.LineItem.PriceData.ProductData =
+        {
           name: item.name,
           metadata: {
-            productId: item.id.toString(),
+            productId: String(item.id),
           },
+        };
+
+      if (item.image && item.image.startsWith("http")) {
+        // productData.images = [item.image];
+      }
+
+      return {
+        price_data: {
+          currency: "brl",
+          product_data: productData,
+          unit_amount: unitAmount,
         },
-        unit_amount: Math.round(parseFloat(item.price) * 100),
-      },
-      quantity: item.quantity,
-    }));
+        quantity: item.quantity,
+      };
+    });
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -45,13 +56,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ url: session.url });
   } catch (error) {
     console.error("Erro no Backend do Stripe:", error);
-
     if (error instanceof Error) {
       return NextResponse.json({ message: error.message }, { status: 500 });
     }
     return NextResponse.json(
       { message: "Erro interno do servidor." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

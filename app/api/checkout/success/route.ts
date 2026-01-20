@@ -19,7 +19,7 @@ export async function GET(request: Request) {
   if (!sessionId) {
     return NextResponse.json(
       { message: "Session ID não fornecido." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -31,7 +31,7 @@ export async function GET(request: Request) {
     if (session.payment_status !== "paid") {
       return NextResponse.json(
         { message: "Pagamento não confirmado." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -41,17 +41,22 @@ export async function GET(request: Request) {
 
       if (!originalId) {
         throw new Error(
-          `Produto ${productData.name} sem ID original no metadata.`
+          `Produto ${productData.name} sem ID original no metadata.`,
         );
       }
 
       return {
-        productId: parseInt(originalId),
+        id: parseInt(originalId),
         quantity: item.quantity,
       };
     });
 
     const v1Url = `${process.env.GESTOR_API_URL}/sales`;
+
+    const payloadV1 = {
+      products: itemsV1,
+    };
+
     console.log(`Tentando registrar venda no V1: ${v1Url}`);
 
     const v1Response = await fetch(v1Url, {
@@ -60,10 +65,7 @@ export async function GET(request: Request) {
         "Content-Type": "application/json",
         "x-api-key": process.env.GESTOR_API_KEY!,
       },
-      body: JSON.stringify({
-        saleDate: new Date().toISOString(),
-        items: itemsV1,
-      }),
+      body: JSON.stringify(payloadV1),
     });
 
     const responseText = await v1Response.text();
@@ -92,7 +94,7 @@ export async function GET(request: Request) {
     }
     return NextResponse.json(
       { message: "Erro interno desconhecido." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
